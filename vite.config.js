@@ -5,13 +5,13 @@ import { join } from 'path'
 import replace from '@rollup/plugin-replace'
 
 // 读取版本号
-const version = readFileSync(join(__dirname, 'VERSION'), 'utf-8').trim()
+const version = readFileSync(join(__dirname, 'version.txt'), 'utf-8').trim()
 
 export default defineConfig({
   plugins: [
     react(),
     replace({
-      __VERSION__: `"${version}"`,
+      __VERSION__: JSON.stringify(version),
       preventAssignment: true,
     }),
   ],

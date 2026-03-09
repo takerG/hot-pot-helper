@@ -76,8 +76,9 @@ function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinish
   return (
     <div className={`timer-card ${getStatusClass()}`}>
       <div className="timer-header">
-        <div>
+        <div className="timer-name-wrapper">
           <span className="timer-name">{item.name}</span>
+          {showFinished && <span className="timer-checkmark">✓</span>}
           {item.recommendedSauce && (
             <button
               className="sauce-recommend-btn"
@@ -96,7 +97,7 @@ function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinish
 
       <div className="timer-display">
         <span className={`timer-countdown ${showFinished ? 'finished' : ''}`}>
-          {showFinished ? '✓ 完成!' : formatTime(timeLeft)}
+          {showFinished ? '完成!' : formatTime(timeLeft)}
         </span>
       </div>
 
@@ -208,8 +209,48 @@ function ActiveTimersOverview({ activeTimers }) {
   );
 }
 
+// 已完成计时器概览组件
+function FinishedTimersOverview({ finishedTimers, activeTimers, onResetAll }) {
+  const finishedItems = Array.from(finishedTimers)
+    .map(id => {
+      for (const cat of categories) {
+        const item = ingredients[cat].items.find(i => i.id === id);
+        if (item) {
+          const state = activeTimers[id];
+          return { ...item, timeLeft: state?.timeLeft || 0 };
+        }
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  if (finishedItems.length === 0) return null;
+
+  return (
+    <div className="finished-timers-overview">
+      <div className="overview-header">
+        <span className="overview-title finished-title">✅ 已完成</span>
+        <div className="overview-actions">
+          <span className="overview-count">{finishedItems.length}个食材</span>
+          <button className="reset-all-btn" onClick={onResetAll}>
+            🔄 一键重置
+          </button>
+        </div>
+      </div>
+      <div className="overview-items">
+        {finishedItems.map(item => (
+          <div key={item.id} className="overview-item finished">
+            <span className="overview-item-name">{item.name}</span>
+            <span className="overview-item-time">{formatTime(item.time)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // 计时器页面
-function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, clearFinished, onSauceClick }) {
+function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, clearFinished, onSauceClick, resetAllFinished }) {
   const [activeCategory, setActiveCategory] = useState('meats');
 
   return (
@@ -233,12 +274,11 @@ function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, 
         />
       </main>
 
-      {finishedTimers.size > 0 && (
-        <div className="finished-toast" onClick={clearFinished}>
-          <span>✅ {finishedTimers.size}个食材已完成</span>
-          <span className="toast-hint">点击关闭</span>
-        </div>
-      )}
+      <FinishedTimersOverview
+        finishedTimers={finishedTimers}
+        activeTimers={activeTimers}
+        onResetAll={resetAllFinished}
+      />
     </>
   );
 }
@@ -246,7 +286,7 @@ function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, 
 // 顶部导航
 function TopNav({ currentPage, onPageChange }) {
   const navItems = [
-    { id: 'timer', icon: '⏱️', label: '计时器' },
+    { id: 'timer', icon: '🥬', label: '菜品' },
     { id: 'sauces', icon: '🥣', label: '蘸料手册' },
   ];
 
@@ -367,6 +407,26 @@ function App() {
     setFinishedTimers(new Set());
   }, []);
 
+  // 一键重置所有完成的计时器
+  const resetAllFinished = useCallback(() => {
+    setFinishedTimers(new Set());
+    // 重置所有已完成计时器的时间
+    setActiveTimers(prev => {
+      const updated = { ...prev };
+      for (const [id, state] of Object.entries(prev)) {
+        // 查找原始时间
+        for (const cat of categories) {
+          const item = ingredients[cat].items.find(i => i.id === id);
+          if (item) {
+            updated[id] = { isActive: false, timeLeft: item.time };
+            break;
+          }
+        }
+      }
+      return updated;
+    });
+  }, []);
+
   // 蘸料手册页面的收藏夹状态
   const [sauceFavorites, setSauceFavorites] = useState(() => {
     const saved = localStorage.getItem('sauce-favorites');
@@ -406,6 +466,7 @@ function App() {
             finishedTimers={finishedTimers}
             clearFinished={clearFinished}
             onSauceClick={handleSauceClick}
+            resetAllFinished={resetAllFinished}
           />
         ) : (
           <SauceGuide />
