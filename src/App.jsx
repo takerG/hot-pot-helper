@@ -54,20 +54,20 @@ function vibrate(pattern = 200) {
 }
 
 // 单个计时器组件
-function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish }) {
+function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinished }) {
   const progress = item.time > 0 ? (timeLeft / item.time) * 100 : 0;
-  const isFinished = timeLeft <= 0 && isActive;
+  const showFinished = timeLeft <= 0 && isFinished;
 
   useEffect(() => {
-    if (isFinished) {
+    if (timeLeft <= 0 && isActive) {
       playAlarm();
       vibrate([200, 100, 200, 100, 200]);
       onFinish(item.id);
     }
-  }, [isFinished, item.id, onFinish]);
+  }, [timeLeft, isActive, item.id, onFinish]);
 
   const getStatusClass = () => {
-    if (isFinished) return 'timer-finished';
+    if (showFinished) return 'timer-finished';
     if (isActive) return 'timer-running';
     return '';
   };
@@ -80,24 +80,24 @@ function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish }) {
       </div>
 
       <div className="timer-display">
-        <span className={`timer-countdown ${isFinished ? 'finished' : ''}`}>
-          {isFinished ? '完成!' : formatTime(timeLeft)}
+        <span className={`timer-countdown ${showFinished ? 'finished' : ''}`}>
+          {showFinished ? '✓ 完成!' : formatTime(timeLeft)}
         </span>
       </div>
 
       <div className="timer-progress">
         <div
           className="timer-progress-bar"
-          style={{ width: `${Math.min(progress, 100)}%` }}
+          style={{ width: `${showFinished ? 100 : Math.min(progress, 100)}%` }}
         />
       </div>
 
       <div className="timer-controls">
         <button
-          className={`timer-btn ${isActive ? 'pause' : 'play'}`}
+          className={`timer-btn ${isActive ? 'pause' : 'play'} ${showFinished ? 'finished' : ''}`}
           onClick={() => onToggle(item.id)}
         >
-          {isActive ? '暂停' : '开始'}
+          {showFinished ? '已完成' : (isActive ? '暂停' : '开始')}
         </button>
         <button
           className="timer-btn reset"
@@ -132,7 +132,7 @@ function CategoryTabs({ activeCategory, onSelect }) {
 }
 
 // 食材列表组件
-function IngredientList({ category, activeTimers, onToggleTimer, onResetTimer, onTimerFinish }) {
+function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish }) {
   const catData = ingredients[category];
 
   return (
@@ -140,12 +140,14 @@ function IngredientList({ category, activeTimers, onToggleTimer, onResetTimer, o
       <div className="ingredient-grid">
         {catData.items.map(item => {
           const timerState = activeTimers[item.id] || { isActive: false, timeLeft: item.time };
+          const isFinished = finishedTimers.has(item.id);
           return (
             <Timer
               key={item.id}
               item={item}
               isActive={timerState.isActive}
               timeLeft={timerState.timeLeft}
+              isFinished={isFinished}
               onToggle={onToggleTimer}
               onReset={onResetTimer}
               onFinish={onTimerFinish}
@@ -191,7 +193,7 @@ function ActiveTimersOverview({ activeTimers }) {
 }
 
 // 计时器页面
-function TimerPage({ activeTimers, onToggleTimer, onResetTimer, onTimerFinish, finishedTimers, clearFinished }) {
+function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, clearFinished }) {
   const [activeCategory, setActiveCategory] = useState('meats');
 
   return (
@@ -207,6 +209,7 @@ function TimerPage({ activeTimers, onToggleTimer, onResetTimer, onTimerFinish, f
         <IngredientList
           category={activeCategory}
           activeTimers={activeTimers}
+          finishedTimers={finishedTimers}
           onToggleTimer={onToggleTimer}
           onResetTimer={onResetTimer}
           onTimerFinish={onTimerFinish}
@@ -223,15 +226,15 @@ function TimerPage({ activeTimers, onToggleTimer, onResetTimer, onTimerFinish, f
   );
 }
 
-// 底部导航
-function BottomNav({ currentPage, onPageChange }) {
+// 顶部导航
+function TopNav({ currentPage, onPageChange }) {
   const navItems = [
     { id: 'timer', icon: '⏱️', label: '计时器' },
     { id: 'sauces', icon: '🥣', label: '蘸料手册' },
   ];
 
   return (
-    <nav className="bottom-nav">
+    <nav className="top-nav">
       {navItems.map(item => (
         <button
           key={item.id}
@@ -331,6 +334,10 @@ function App() {
 
   return (
     <div className="app">
+      <nav className="top-nav">
+        <TopNav currentPage={currentPage} onPageChange={setCurrentPage} />
+      </nav>
+
       <header className="app-header">
         <h1 className="app-title">
           {currentPage === 'timer' ? '🍲 火锅助手' : '🥣 蘸料手册'}
@@ -354,8 +361,6 @@ function App() {
           <SauceGuide />
         )}
       </div>
-
-      <BottomNav currentPage={currentPage} onPageChange={setCurrentPage} />
 
       <footer className="app-footer">
         <p>Version {version}</p>

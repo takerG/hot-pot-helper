@@ -5,26 +5,47 @@
 }
 
 :root {
-  --primary-color: #e74c3c;
-  --primary-dark: #c0392b;
-  --secondary-color: #f39c12;
-  --background-color: #fafafa;
+  /* 主色调 - 珊瑚红 */
+  --primary-color: #ff6b6b;
+  --primary-dark: #ee5a5a;
+  --primary-light: #ff8e8e;
+
+  /* 辅助色 - 温暖橙 */
+  --secondary-color: #ffa94d;
+  --secondary-light: #ffc078;
+
+  /* 成功色 - 清新绿 */
+  --success-color: #51cf66;
+  --success-light: #69db7c;
+
+  /* 背景色 */
+  --background-color: #f8f9fa;
   --card-background: #ffffff;
-  --text-primary: #2c3e50;
-  --text-secondary: #7f8c8d;
-  --border-color: #ecf0f1;
-  --success-color: #27ae60;
-  --shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+  /* 文字色 */
+  --text-primary: #212529;
+  --text-secondary: #868e96;
+  --text-light: #adb5bd;
+
+  /* 边框色 */
+  --border-color: #e9ecef;
+
+  /* 阴影 */
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+
+  /* 安全区域 */
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html, body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   background-color: var(--background-color);
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
 }
 
 #root {
