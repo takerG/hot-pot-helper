@@ -1,13 +1,16 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { sauces, sauceCategories, soupBases, soupBaseCategories } from './sauces.js';
 
 // 搜索和筛选蘸料
 export function useSauceFilter() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTag, setSelectedTag] = useState('all');
   const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem('sauce-favorites');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('sauce-favorites');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
   });
 
   const toggleFavorite = useCallback((id) => {
@@ -20,11 +23,11 @@ export function useSauceFilter() {
     });
   }, []);
 
-  return { searchTerm, setSearchTerm, selectedTag, setSelectedTag, favorites, toggleFavorite };
+  return { searchTerm, setSearchTerm, favorites, toggleFavorite };
 }
 
 // 标签组件
-function Tag({ tag, active, onClick }) {
+const Tag = React.memo(function Tag({ tag, active, onClick }) {
   return (
     <button
       className={`sauce-tag ${active ? 'active' : ''}`}
@@ -33,7 +36,7 @@ function Tag({ tag, active, onClick }) {
       {tag}
     </button>
   );
-}
+});
 
 // 收藏按钮
 export function FavoriteButton({ isFavorite, onToggle }) {
@@ -51,7 +54,7 @@ export function FavoriteButton({ isFavorite, onToggle }) {
 }
 
 // 单个蘸料卡片
-function SauceCard({ recipe, isFavorite, onToggleFavorite, onClick }) {
+const SauceCard = React.memo(function SauceCard({ recipe, isFavorite, onToggleFavorite, onClick }) {
   return (
     <div className="sauce-card" onClick={onClick}>
       <div className="sauce-card-header">
@@ -69,7 +72,7 @@ function SauceCard({ recipe, isFavorite, onToggleFavorite, onClick }) {
       </p>
     </div>
   );
-}
+});
 
 // 蘸料详情弹窗
 export function SauceModal({ recipe, onClose, isFavorite, onToggleFavorite }) {
@@ -120,10 +123,17 @@ export function SauceModal({ recipe, onClose, isFavorite, onToggleFavorite }) {
 }
 
 // 锅底搭配推荐
-function SoupBasePairing() {
-  const [selectedBase, setSelectedBase] = useState(null);
-
-  const allPairings = Object.values(soupBases).flatMap(base => base.pairings);
+const SoupBasePairing = React.memo(function SoupBasePairing() {
+  // 缓存酱料名称查找
+  const sauceNameCache = useMemo(() => {
+    const cache = {};
+    for (const cat of Object.values(sauces)) {
+      for (const recipe of cat.recipes) {
+        cache[recipe.id] = recipe.name;
+      }
+    }
+    return cache;
+  }, []);
 
   return (
     <div className="soup-pairings">
@@ -143,22 +153,11 @@ function SoupBasePairing() {
                 <div key={pairing.name} className="pairing-item">
                   <div className="pairing-soup">{pairing.name}</div>
                   <div className="pairing-sauces">
-                    {pairing.sauces.map(sauceId => {
-                      // 查找蘸料名称
-                      let sauceName = '';
-                      for (const cat of Object.values(sauces)) {
-                        const found = cat.recipes.find(r => r.id === sauceId);
-                        if (found) {
-                          sauceName = found.name;
-                          break;
-                        }
-                      }
-                      return (
-                        <span key={sauceId} className="pairing-sauce-tag">
-                          {sauceName}
-                        </span>
-                      );
-                    })}
+                    {pairing.sauces.map(sauceId => (
+                      <span key={sauceId} className="pairing-sauce-tag">
+                        {sauceNameCache[sauceId] || sauceId}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -168,27 +167,33 @@ function SoupBasePairing() {
       </div>
     </div>
   );
-}
+});
 
 // 蘸料手册主页面
 function SauceGuide() {
   const [activeCategory, setActiveCategory] = useState('classic');
   const [selectedSauce, setSelectedSauce] = useState(null);
+  const [selectedTag, setSelectedTag] = useState('all');
   const { searchTerm, setSearchTerm, favorites, toggleFavorite } = useSauceFilter();
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
   const category = sauces[activeCategory];
 
-  // 筛选蘸料
-  let filteredRecipes = category.recipes.filter(recipe => {
-    const matchesSearch = recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         recipe.description.includes(searchTerm);
-    const matchesFavorite = !showOnlyFavorites || favorites.includes(recipe.id);
-    return matchesSearch && matchesFavorite;
-  });
-
   // 收集所有标签
-  const allTags = ['all', ...new Set(category.recipes.flatMap(r => r.tags))];
+  const allTags = useMemo(() => {
+    return ['all', ...new Set(category.recipes.flatMap(r => r.tags))];
+  }, [category.recipes]);
+
+  // 筛选蘸料
+  const filteredRecipes = useMemo(() => {
+    return category.recipes.filter(recipe => {
+      const matchesSearch = recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           recipe.description.includes(searchTerm);
+      const matchesFavorite = !showOnlyFavorites || favorites.includes(recipe.id);
+      const matchesTag = selectedTag === 'all' || recipe.tags.includes(selectedTag);
+      return matchesSearch && matchesFavorite && matchesTag;
+    });
+  }, [category.recipes, searchTerm, showOnlyFavorites, favorites, selectedTag]);
 
   return (
     <div className="sauce-guide">
@@ -238,8 +243,8 @@ function SauceGuide() {
           <Tag
             key={tag}
             tag={tag === 'all' ? '全部' : tag}
-            active={false}
-            onClick={() => {}}
+            active={selectedTag === tag}
+            onClick={() => setSelectedTag(selectedTag === tag ? 'all' : tag)}
           />
         ))}
       </div>

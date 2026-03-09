@@ -6,7 +6,7 @@
 
 /* Header */
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
   color: white;
   padding: 20px 16px;
   text-align: center;
@@ -64,9 +64,9 @@
 }
 
 .category-tab.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
-  border-color: #667eea;
+  border-color: var(--primary-color);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
@@ -144,10 +144,10 @@
 
 @keyframes pulse-border {
   0%, 100% {
-    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 2px 12px rgba(var(--primary-color-rgb), 0.2);
   }
   50% {
-    box-shadow: 0 2px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 2px 20px rgba(var(--primary-color-rgb), 0.4);
   }
 }
 
@@ -180,24 +180,24 @@
 .sauce-recommend-btn {
   font-size: 11px;
   padding: 3px 8px;
-  background: linear-gradient(135deg, #f0f4ff, #e8eefb);
-  border: 1px solid #d0d9f0;
+  background: linear-gradient(135deg, rgba(91, 143, 249, 0.1), rgba(91, 143, 249, 0.05));
+  border: 1px solid rgba(91, 143, 249, 0.3);
   border-radius: 10px;
-  color: #667eea;
+  color: var(--primary-color);
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
 }
 
 .sauce-recommend-btn:hover {
-  background: linear-gradient(135deg, #e8eefb, #d9e2f8);
-  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(91, 143, 249, 0.15), rgba(91, 143, 249, 0.08));
+  border-color: var(--primary-color);
 }
 
 .sauce-recommend-btn:active {
-  background: #667eea;
+  background: var(--primary-color);
   color: white;
-  border-color: #667eea;
+  border-color: var(--primary-color);
 }
 
 .timer-duration {
@@ -222,20 +222,10 @@
 
 .timer-countdown.finished {
   color: var(--success-color);
-  animation: bounce 0.5s ease infinite;
   background: linear-gradient(135deg, #5cdbd3, #8be6e0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
 }
 
 .timer-progress {

@@ -1,47 +1,44 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ingredients, categories } from './data.js';
 import { sauces, sauceCategories } from './sauces.js';
-import SauceGuide, { SauceModal, FavoriteButton } from './SauceGuide.jsx';
+import SauceGuide, { SauceModal, FavoriteButton, useSauceFilter } from './SauceGuide.jsx';
 import version from './version.js';
 import './App.css';
 
 // 格式化时间为 MM:SS 格式
 function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const mins = Math.floor(Math.max(0, seconds) / 60);
+  const secs = Math.max(0, seconds) % 60;
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// 播放提示音
+// 播放提示音 - 使用单例模式
+let audioContext = null;
 function playAlarm() {
   try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    const playTone = (freq, startTime, duration) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
 
-    oscillator.frequency.value = 880;
-    oscillator.type = 'sine';
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
 
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
+      oscillator.frequency.value = freq;
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.3, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
-    setTimeout(() => {
-      const osc2 = audioContext.createOscillator();
-      const gain2 = audioContext.createGain();
-      osc2.connect(gain2);
-      gain2.connect(audioContext.destination);
-      osc2.frequency.value = 880;
-      osc2.type = 'sine';
-      gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      osc2.start(audioContext.currentTime);
-      osc2.stop(audioContext.currentTime + 0.5);
-    }, 600);
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+    };
+
+    const now = audioContext.currentTime;
+    playTone(880, now, 0.5);
+    playTone(880, now + 0.6, 0.5);
   } catch (e) {
     console.log('Audio not supported');
   }
@@ -50,13 +47,20 @@ function playAlarm() {
 // 震动反馈
 function vibrate(pattern = 200) {
   if (navigator.vibrate) {
-    navigator.vibrate(pattern);
+    try {
+      navigator.vibrate(pattern);
+    } catch (e) {
+      // 忽略震动 API 错误
+    }
   }
 }
 
-// 单个计时器组件
-function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinished, onSauceClick }) {
-  const progress = item.time > 0 ? (timeLeft / item.time) * 100 : 0;
+// 单个计时器组件 - 使用 useMemo 优化
+const Timer = React.memo(function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinished, onSauceClick }) {
+  const progress = useMemo(() => {
+    return item.time > 0 ? (timeLeft / item.time) * 100 : 0;
+  }, [item.time, timeLeft]);
+
   const showFinished = timeLeft <= 0 && isFinished;
 
   useEffect(() => {
@@ -67,11 +71,11 @@ function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinish
     }
   }, [timeLeft, isActive, item.id, onFinish]);
 
-  const getStatusClass = () => {
+  const getStatusClass = useCallback(() => {
     if (showFinished) return 'timer-finished';
     if (isActive) return 'timer-running';
     return '';
-  };
+  }, [showFinished, isActive]);
 
   return (
     <div className={`timer-card ${getStatusClass()}`}>
@@ -79,7 +83,7 @@ function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinish
         <div className="timer-name-wrapper">
           <span className="timer-name">{item.name}</span>
           {showFinished && <span className="timer-checkmark">✓</span>}
-          {item.recommendedSauce && (
+          {item.recommendedSauce && !showFinished && (
             <button
               className="sauce-recommend-btn"
               onClick={(e) => {
@@ -124,10 +128,10 @@ function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinish
       </div>
     </div>
   );
-}
+});
 
 // 分类标签组件
-function CategoryTabs({ activeCategory, onSelect }) {
+const CategoryTabs = React.memo(function CategoryTabs({ activeCategory, onSelect }) {
   return (
     <div className="category-tabs">
       {categories.map(catId => {
@@ -145,10 +149,10 @@ function CategoryTabs({ activeCategory, onSelect }) {
       })}
     </div>
   );
-}
+});
 
 // 食材列表组件
-function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, onSauceClick }) {
+const IngredientList = React.memo(function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, onSauceClick }) {
   const catData = ingredients[category];
 
   return (
@@ -174,20 +178,22 @@ function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer,
       </div>
     </div>
   );
-}
+});
 
 // 活动计时器概览组件
-function ActiveTimersOverview({ activeTimers }) {
-  const activeItems = Object.entries(activeTimers)
-    .filter(([_, state]) => state.isActive && state.timeLeft > 0)
-    .map(([id, state]) => {
-      for (const cat of categories) {
-        const item = ingredients[cat].items.find(i => i.id === id);
-        if (item) return { ...item, ...state };
-      }
-      return null;
-    })
-    .filter(Boolean);
+const ActiveTimersOverview = React.memo(function ActiveTimersOverview({ activeTimers }) {
+  const activeItems = useMemo(() => {
+    return Object.entries(activeTimers)
+      .filter(([_, state]) => state.isActive && state.timeLeft > 0)
+      .map(([id, state]) => {
+        for (const cat of categories) {
+          const item = ingredients[cat].items.find(i => i.id === id);
+          if (item) return { ...item, ...state };
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }, [activeTimers]);
 
   if (activeItems.length === 0) return null;
 
@@ -207,22 +213,24 @@ function ActiveTimersOverview({ activeTimers }) {
       </div>
     </div>
   );
-}
+});
 
 // 已完成计时器概览组件
-function FinishedTimersOverview({ finishedTimers, activeTimers, onResetAll }) {
-  const finishedItems = Array.from(finishedTimers)
-    .map(id => {
-      for (const cat of categories) {
-        const item = ingredients[cat].items.find(i => i.id === id);
-        if (item) {
-          const state = activeTimers[id];
-          return { ...item, timeLeft: state?.timeLeft || 0 };
+const FinishedTimersOverview = React.memo(function FinishedTimersOverview({ finishedTimers, activeTimers, onResetAll }) {
+  const finishedItems = useMemo(() => {
+    return Array.from(finishedTimers)
+      .map(id => {
+        for (const cat of categories) {
+          const item = ingredients[cat].items.find(i => i.id === id);
+          if (item) {
+            const state = activeTimers[id];
+            return { ...item, time: state?.timeLeft !== undefined ? state.timeLeft : item.time };
+          }
         }
-      }
-      return null;
-    })
-    .filter(Boolean);
+        return null;
+      })
+      .filter(Boolean);
+  }, [finishedTimers, activeTimers]);
 
   if (finishedItems.length === 0) return null;
 
@@ -247,10 +255,10 @@ function FinishedTimersOverview({ finishedTimers, activeTimers, onResetAll }) {
       </div>
     </div>
   );
-}
+});
 
 // 计时器页面
-function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, clearFinished, onSauceClick, resetAllFinished }) {
+function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, onSauceClick, resetAllFinished }) {
   const [activeCategory, setActiveCategory] = useState('meats');
 
   return (
@@ -284,7 +292,7 @@ function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, 
 }
 
 // 顶部导航
-function TopNav({ currentPage, onPageChange }) {
+const TopNav = React.memo(function TopNav({ currentPage, onPageChange }) {
   const navItems = [
     { id: 'timer', icon: '🥬', label: '菜品' },
     { id: 'sauces', icon: '🥣', label: '蘸料手册' },
@@ -304,7 +312,7 @@ function TopNav({ currentPage, onPageChange }) {
       ))}
     </nav>
   );
-}
+});
 
 function App() {
   const [currentPage, setCurrentPage] = useState('timer');
@@ -312,14 +320,20 @@ function App() {
   const [finishedTimers, setFinishedTimers] = useState(new Set());
   const [selectedSauce, setSelectedSauce] = useState(null);
 
-  // 从酱料数据中查找酱料
-  const findSauceById = useCallback((sauceId) => {
+  // 从酱料数据中查找酱料 - 使用缓存
+  const sauceCache = useMemo(() => {
+    const cache = {};
     for (const cat of Object.values(sauces)) {
-      const recipe = cat.recipes.find(r => r.id === sauceId);
-      if (recipe) return recipe;
+      for (const recipe of cat.recipes) {
+        cache[recipe.id] = recipe;
+      }
     }
-    return null;
+    return cache;
   }, []);
+
+  const findSauceById = useCallback((sauceId) => {
+    return sauceCache[sauceId] || null;
+  }, [sauceCache]);
 
   // 处理推荐蘸料点击
   const handleSauceClick = useCallback((sauceId) => {
@@ -329,20 +343,31 @@ function App() {
     }
   }, [findSauceById]);
 
-  // 计时器更新
+  // 计时器更新 - 优化：只在有活动计时器时更新
   useEffect(() => {
+    const hasActiveTimers = Object.values(activeTimers).some(state => state.isActive && state.timeLeft > 0);
+    if (!hasActiveTimers) return;
+
     const interval = setInterval(() => {
       setActiveTimers(prev => {
         const updated = {};
         let hasChanges = false;
+        let hasActive = false;
 
         for (const [id, state] of Object.entries(prev)) {
           if (state.isActive && state.timeLeft > 0) {
             updated[id] = { ...state, timeLeft: state.timeLeft - 1 };
             hasChanges = true;
+            hasActive = true;
           } else {
             updated[id] = state;
+            if (state.isActive && state.timeLeft > 0) hasActive = true;
           }
+        }
+
+        // 如果没有活动计时器，清除 interval
+        if (!hasActive) {
+          // 会在下次 effect 运行时清除
         }
 
         return hasChanges ? updated : prev;
@@ -350,7 +375,7 @@ function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [activeTimers]);
 
   const handleToggleTimer = useCallback((id) => {
     setActiveTimers(prev => {
@@ -374,20 +399,18 @@ function App() {
   }, []);
 
   const handleResetTimer = useCallback((id) => {
-    setActiveTimers(prev => {
-      let defaultTime = 60;
-      for (const cat of categories) {
-        const item = ingredients[cat].items.find(i => i.id === id);
-        if (item) {
-          defaultTime = item.time;
-          break;
-        }
+    let defaultTime = 60;
+    for (const cat of categories) {
+      const item = ingredients[cat].items.find(i => i.id === id);
+      if (item) {
+        defaultTime = item.time;
+        break;
       }
-      return {
-        ...prev,
-        [id]: { isActive: false, timeLeft: defaultTime }
-      };
-    });
+    }
+    setActiveTimers(prev => ({
+      ...prev,
+      [id]: { isActive: false, timeLeft: defaultTime }
+    }));
     setFinishedTimers(prev => {
       const next = new Set(prev);
       next.delete(id);
@@ -403,18 +426,12 @@ function App() {
     setFinishedTimers(prev => new Set(prev).add(id));
   }, []);
 
-  const clearFinished = useCallback(() => {
-    setFinishedTimers(new Set());
-  }, []);
-
   // 一键重置所有完成的计时器
   const resetAllFinished = useCallback(() => {
     setFinishedTimers(new Set());
-    // 重置所有已完成计时器的时间
     setActiveTimers(prev => {
       const updated = { ...prev };
       for (const [id, state] of Object.entries(prev)) {
-        // 查找原始时间
         for (const cat of categories) {
           const item = ingredients[cat].items.find(i => i.id === id);
           if (item) {
@@ -427,21 +444,8 @@ function App() {
     });
   }, []);
 
-  // 蘸料手册页面的收藏夹状态
-  const [sauceFavorites, setSauceFavorites] = useState(() => {
-    const saved = localStorage.getItem('sauce-favorites');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const toggleSauceFavorite = useCallback((id) => {
-    setSauceFavorites(prev => {
-      const next = prev.includes(id)
-        ? prev.filter(f => f !== id)
-        : [...prev, id];
-      localStorage.setItem('sauce-favorites', JSON.stringify(next));
-      return next;
-    });
-  }, []);
+  // 蘸料手册页面的收藏夹状态 - 使用统一的 useSauceFilter
+  const { favorites: sauceFavorites, toggleFavorite: toggleSauceFavorite } = useSauceFilter();
 
   return (
     <div className="app">
@@ -464,7 +468,6 @@ function App() {
             onResetTimer={handleResetTimer}
             onTimerFinish={handleTimerFinish}
             finishedTimers={finishedTimers}
-            clearFinished={clearFinished}
             onSauceClick={handleSauceClick}
             resetAllFinished={resetAllFinished}
           />
