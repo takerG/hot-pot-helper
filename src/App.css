@@ -8,7 +8,7 @@
 .app-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 16px 16px 20px;
+  padding: 20px 16px;
   text-align: center;
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
   flex-shrink: 0;
@@ -192,6 +192,31 @@
   font-size: 15px;
   font-weight: 500;
   color: var(--text-primary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sauce-recommend-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, #f0f4ff, #e8eefb);
+  border: 1px solid #d0d9f0;
+  border-radius: 10px;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.sauce-recommend-btn:hover {
+  background: linear-gradient(135deg, #e8eefb, #d9e2f8);
+  border-color: #667eea;
+}
+
+.sauce-recommend-btn:active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
 }
 
 .timer-duration {
@@ -397,15 +422,13 @@
 
 /* Top Navigation */
 .top-nav {
-  position: sticky;
-  top: 0;
   background: var(--card-background);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-around;
   padding: 8px 0;
-  padding-top: env(safe-area-inset-top, 8px);
   z-index: 50;
+  flex-shrink: 0;
 }
 
 .nav-item {

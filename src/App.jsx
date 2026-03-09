@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ingredients, categories } from './data.js';
-import SauceGuide from './SauceGuide.jsx';
+import { sauces, sauceCategories } from './sauces.js';
+import SauceGuide, { SauceModal, FavoriteButton } from './SauceGuide.jsx';
 import version from './version.js';
 import './App.css';
 
@@ -54,7 +55,7 @@ function vibrate(pattern = 200) {
 }
 
 // 单个计时器组件
-function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinished }) {
+function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinished, onSauceClick }) {
   const progress = item.time > 0 ? (timeLeft / item.time) * 100 : 0;
   const showFinished = timeLeft <= 0 && isFinished;
 
@@ -75,7 +76,21 @@ function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinish
   return (
     <div className={`timer-card ${getStatusClass()}`}>
       <div className="timer-header">
-        <span className="timer-name">{item.name}</span>
+        <div>
+          <span className="timer-name">{item.name}</span>
+          {item.recommendedSauce && (
+            <button
+              className="sauce-recommend-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSauceClick(item.recommendedSauce);
+              }}
+              title="查看推荐蘸料"
+            >
+              🥣 推荐蘸料
+            </button>
+          )}
+        </div>
         <span className="timer-duration">{formatTime(item.time)}</span>
       </div>
 
@@ -132,7 +147,7 @@ function CategoryTabs({ activeCategory, onSelect }) {
 }
 
 // 食材列表组件
-function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish }) {
+function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, onSauceClick }) {
   const catData = ingredients[category];
 
   return (
@@ -151,6 +166,7 @@ function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer,
               onToggle={onToggleTimer}
               onReset={onResetTimer}
               onFinish={onTimerFinish}
+              onSauceClick={onSauceClick}
             />
           );
         })}
@@ -193,7 +209,7 @@ function ActiveTimersOverview({ activeTimers }) {
 }
 
 // 计时器页面
-function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, clearFinished }) {
+function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, clearFinished, onSauceClick }) {
   const [activeCategory, setActiveCategory] = useState('meats');
 
   return (
@@ -213,6 +229,7 @@ function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, 
           onToggleTimer={onToggleTimer}
           onResetTimer={onResetTimer}
           onTimerFinish={onTimerFinish}
+          onSauceClick={onSauceClick}
         />
       </main>
 
@@ -253,6 +270,24 @@ function App() {
   const [currentPage, setCurrentPage] = useState('timer');
   const [activeTimers, setActiveTimers] = useState({});
   const [finishedTimers, setFinishedTimers] = useState(new Set());
+  const [selectedSauce, setSelectedSauce] = useState(null);
+
+  // 从酱料数据中查找酱料
+  const findSauceById = useCallback((sauceId) => {
+    for (const cat of Object.values(sauces)) {
+      const recipe = cat.recipes.find(r => r.id === sauceId);
+      if (recipe) return recipe;
+    }
+    return null;
+  }, []);
+
+  // 处理推荐蘸料点击
+  const handleSauceClick = useCallback((sauceId) => {
+    const recipe = findSauceById(sauceId);
+    if (recipe) {
+      setSelectedSauce(recipe);
+    }
+  }, [findSauceById]);
 
   // 计时器更新
   useEffect(() => {
@@ -332,20 +367,34 @@ function App() {
     setFinishedTimers(new Set());
   }, []);
 
+  // 蘸料手册页面的收藏夹状态
+  const [sauceFavorites, setSauceFavorites] = useState(() => {
+    const saved = localStorage.getItem('sauce-favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const toggleSauceFavorite = useCallback((id) => {
+    setSauceFavorites(prev => {
+      const next = prev.includes(id)
+        ? prev.filter(f => f !== id)
+        : [...prev, id];
+      localStorage.setItem('sauce-favorites', JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   return (
     <div className="app">
-      <nav className="top-nav">
-        <TopNav currentPage={currentPage} onPageChange={setCurrentPage} />
-      </nav>
-
       <header className="app-header">
-        <h1 className="app-title">
-          {currentPage === 'timer' ? '🍲 火锅助手' : '🥣 蘸料手册'}
-        </h1>
+        <h1 className="app-title">🍲 火锅助手</h1>
         <p className="app-subtitle">
           {currentPage === 'timer' ? '精准掌握每种食材的最佳口感' : '调配属于你的完美蘸料'}
         </p>
       </header>
+
+      <nav className="top-nav">
+        <TopNav currentPage={currentPage} onPageChange={setCurrentPage} />
+      </nav>
 
       <div className="page-content">
         {currentPage === 'timer' ? (
@@ -356,11 +405,22 @@ function App() {
             onTimerFinish={handleTimerFinish}
             finishedTimers={finishedTimers}
             clearFinished={clearFinished}
+            onSauceClick={handleSauceClick}
           />
         ) : (
           <SauceGuide />
         )}
       </div>
+
+      {/* 蘸料详情弹窗 - 全局可用 */}
+      {selectedSauce && (
+        <SauceModal
+          recipe={selectedSauce}
+          onClose={() => setSelectedSauce(null)}
+          isFavorite={sauceFavorites.includes(selectedSauce.id)}
+          onToggleFavorite={() => toggleSauceFavorite(selectedSauce.id)}
+        />
+      )}
 
       <footer className="app-footer">
         <p>Version {version}</p>

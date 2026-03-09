@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { sauces, sauceCategories, soupBases, soupBaseCategories } from './sauces.js';
 
 // 搜索和筛选蘸料
-function useSauceFilter() {
+export function useSauceFilter() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('all');
   const [favorites, setFavorites] = useState(() => {
@@ -36,7 +36,7 @@ function Tag({ tag, active, onClick }) {
 }
 
 // 收藏按钮
-function FavoriteButton({ isFavorite, onToggle }) {
+export function FavoriteButton({ isFavorite, onToggle }) {
   return (
     <button
       className={`favorite-btn ${isFavorite ? 'active' : ''}`}
@@ -72,7 +72,7 @@ function SauceCard({ recipe, isFavorite, onToggleFavorite, onClick }) {
 }
 
 // 蘸料详情弹窗
-function SauceModal({ recipe, onClose, isFavorite, onToggleFavorite }) {
+export function SauceModal({ recipe, onClose, isFavorite, onToggleFavorite }) {
   if (!recipe) return null;
 
   return (
