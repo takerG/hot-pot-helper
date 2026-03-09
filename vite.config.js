@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [
     react(),
     replace({
-      __VERSION__: JSON.stringify(version),
+      __VERSION__: `"${version}"`,
       preventAssignment: true,
     }),
   ],

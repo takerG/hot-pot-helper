@@ -6,11 +6,11 @@
 
 /* Header */
 .app-header {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 16px 16px 20px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.25);
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
   flex-shrink: 0;
 }
 
@@ -64,10 +64,10 @@
 }
 
 .category-tab.active {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border-color: #ff6b6b;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .tab-icon {
@@ -110,8 +110,8 @@
 .timer-card.timer-finished {
   border-color: var(--success-color);
   border-width: 3px;
-  background: linear-gradient(135deg, #e8f5e9 0%, #f0fff4 50%, #c8e6c9 100%);
-  box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4), inset 0 0 20px rgba(39, 174, 96, 0.1);
+  background: linear-gradient(135deg, #f0fdfa 0%, #ecfdf5 50%, #d1fae5 100%);
+  box-shadow: 0 4px 20px rgba(92, 219, 211, 0.35), inset 0 0 20px rgba(92, 219, 211, 0.08);
   animation: finished-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -147,7 +147,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  background: linear-gradient(135deg, #5cdbd3, #8be6e0);
   color: white;
   width: 28px;
   height: 28px;
@@ -157,7 +157,7 @@
   justify-content: center;
   font-size: 16px;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4);
+  box-shadow: 0 2px 8px rgba(92, 219, 211, 0.4);
   animation: checkmark-appear 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -174,10 +174,10 @@
 
 @keyframes pulse-border {
   0%, 100% {
-    box-shadow: 0 2px 12px rgba(231, 76, 60, 0.2);
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.2);
   }
   50% {
-    box-shadow: 0 2px 20px rgba(231, 76, 60, 0.4);
+    box-shadow: 0 2px 20px rgba(102, 126, 234, 0.4);
   }
 }
 
@@ -217,7 +217,7 @@
 .timer-countdown.finished {
   color: var(--success-color);
   animation: bounce 0.5s ease infinite;
-  background: linear-gradient(135deg, #51cf66, #69db7c);
+  background: linear-gradient(135deg, #5cdbd3, #8be6e0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -242,7 +242,7 @@
 
 .timer-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #ff6b6b, #ffa94d);
+  background: linear-gradient(90deg, #667eea, #764ba2);
   border-radius: 2px;
   transition: width 0.3s ease;
 }
@@ -269,25 +269,25 @@
 }
 
 .timer-btn.play {
-  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .timer-btn.play:active {
-  background: linear-gradient(135deg, #ee5a5a, #ff6b6b);
-  box-shadow: 0 1px 4px rgba(255, 107, 107, 0.3);
+  background: linear-gradient(135deg, #5a6fd6, #6a4190);
+  box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
 }
 
 .timer-btn.pause {
-  background: linear-gradient(135deg, #ffa94d, #ffc078);
+  background: linear-gradient(135deg, #61c5d8, #87d4e3);
   color: white;
-  box-shadow: 0 2px 8px rgba(255, 169, 77, 0.3);
+  box-shadow: 0 2px 8px rgba(97, 197, 216, 0.3);
 }
 
 .timer-btn.pause:active {
-  background: linear-gradient(135deg, #ff9f3a, #ffa94d);
-  box-shadow: 0 1px 4px rgba(255, 169, 77, 0.3);
+  background: linear-gradient(135deg, #52b5c9, #78c6d4);
+  box-shadow: 0 1px 4px rgba(97, 197, 216, 0.3);
 }
 
 .timer-btn.reset {
@@ -306,7 +306,7 @@
 
 /* Active Timers Overview */
 .active-timers-overview {
-  background: linear-gradient(135deg, #fff5f5, #fff);
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
   border-bottom: 1px solid var(--border-color);
   padding: 12px 16px;
 }
@@ -432,7 +432,7 @@
   transform: translateX(-50%) scaleX(0);
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(255, 107, 107, 0.08), transparent);
+  background: linear-gradient(180deg, rgba(102, 126, 234, 0.08), transparent);
   border-radius: 12px;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -452,7 +452,7 @@
 
 .nav-item.active .nav-icon {
   transform: scale(1.1);
-  filter: drop-shadow(0 2px 6px rgba(255, 107, 107, 0.35));
+  filter: drop-shadow(0 2px 6px rgba(102, 126, 234, 0.35));
 }
 
 .nav-label {
@@ -645,7 +645,7 @@
 
 .favorite-btn.active {
   color: var(--secondary-color);
-  background: #fef3e2;
+  background: #e8f6f8;
 }
 
 .sauce-card-desc {
@@ -779,7 +779,7 @@
 }
 
 .modal-tips {
-  background: linear-gradient(135deg, #fff8e1, #fff);
+  background: linear-gradient(135deg, #f0f7ff 0%, #f5f9ff 100%);
   border-radius: 12px;
   padding: 16px !important;
 }
