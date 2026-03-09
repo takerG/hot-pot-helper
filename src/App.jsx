@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ingredients, categories } from './data.js';
+import SauceGuide from './SauceGuide.jsx';
+import version from './version.js';
 import './App.css';
 
 // 格式化时间为 MM:SS 格式
@@ -27,7 +29,6 @@ function playAlarm() {
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.5);
 
-    // 播放两次提示音
     setTimeout(() => {
       const osc2 = audioContext.createOscillator();
       const gain2 = audioContext.createGain();
@@ -157,11 +158,10 @@ function IngredientList({ category, activeTimers, onToggleTimer, onResetTimer, o
 }
 
 // 活动计时器概览组件
-function ActiveTimersOverview({ activeTimers, onToggleTimer, onResetTimer }) {
+function ActiveTimersOverview({ activeTimers }) {
   const activeItems = Object.entries(activeTimers)
     .filter(([_, state]) => state.isActive && state.timeLeft > 0)
     .map(([id, state]) => {
-      // 查找食材信息
       for (const cat of categories) {
         const item = ingredients[cat].items.find(i => i.id === id);
         if (item) return { ...item, ...state };
@@ -190,8 +190,64 @@ function ActiveTimersOverview({ activeTimers, onToggleTimer, onResetTimer }) {
   );
 }
 
-function App() {
+// 计时器页面
+function TimerPage({ activeTimers, onToggleTimer, onResetTimer, onTimerFinish, finishedTimers, clearFinished }) {
   const [activeCategory, setActiveCategory] = useState('meats');
+
+  return (
+    <>
+      <ActiveTimersOverview activeTimers={activeTimers} />
+
+      <CategoryTabs
+        activeCategory={activeCategory}
+        onSelect={setActiveCategory}
+      />
+
+      <main className="app-main">
+        <IngredientList
+          category={activeCategory}
+          activeTimers={activeTimers}
+          onToggleTimer={onToggleTimer}
+          onResetTimer={onResetTimer}
+          onTimerFinish={onTimerFinish}
+        />
+      </main>
+
+      {finishedTimers.size > 0 && (
+        <div className="finished-toast" onClick={clearFinished}>
+          <span>✅ {finishedTimers.size}个食材已完成</span>
+          <span className="toast-hint">点击关闭</span>
+        </div>
+      )}
+    </>
+  );
+}
+
+// 底部导航
+function BottomNav({ currentPage, onPageChange }) {
+  const navItems = [
+    { id: 'timer', icon: '⏱️', label: '计时器' },
+    { id: 'sauces', icon: '🥣', label: '蘸料手册' },
+  ];
+
+  return (
+    <nav className="bottom-nav">
+      {navItems.map(item => (
+        <button
+          key={item.id}
+          className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+          onClick={() => onPageChange(item.id)}
+        >
+          <span className="nav-icon">{item.icon}</span>
+          <span className="nav-label">{item.label}</span>
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function App() {
+  const [currentPage, setCurrentPage] = useState('timer');
   const [activeTimers, setActiveTimers] = useState({});
   const [finishedTimers, setFinishedTimers] = useState(new Set());
 
@@ -222,7 +278,6 @@ function App() {
     setActiveTimers(prev => {
       const currentState = prev[id];
       if (!currentState) {
-        // 找到食材的默认时间
         let defaultTime = 60;
         for (const cat of categories) {
           const item = ingredients[cat].items.find(i => i.id === id);
@@ -270,7 +325,6 @@ function App() {
     setFinishedTimers(prev => new Set(prev).add(id));
   }, []);
 
-  // 清除完成状态
   const clearFinished = useCallback(() => {
     setFinishedTimers(new Set());
   }, []);
@@ -278,40 +332,33 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="app-title">🍲 火锅计时器</h1>
-        <p className="app-subtitle">精准掌握每种食材的最佳口感</p>
+        <h1 className="app-title">
+          {currentPage === 'timer' ? '🍲 火锅助手' : '🥣 蘸料手册'}
+        </h1>
+        <p className="app-subtitle">
+          {currentPage === 'timer' ? '精准掌握每种食材的最佳口感' : '调配属于你的完美蘸料'}
+        </p>
       </header>
 
-      <ActiveTimersOverview
-        activeTimers={activeTimers}
-        onToggleTimer={handleToggleTimer}
-        onResetTimer={handleResetTimer}
-      />
+      <div className="page-content">
+        {currentPage === 'timer' ? (
+          <TimerPage
+            activeTimers={activeTimers}
+            onToggleTimer={handleToggleTimer}
+            onResetTimer={handleResetTimer}
+            onTimerFinish={handleTimerFinish}
+            finishedTimers={finishedTimers}
+            clearFinished={clearFinished}
+          />
+        ) : (
+          <SauceGuide />
+        )}
+      </div>
 
-      <CategoryTabs
-        activeCategory={activeCategory}
-        onSelect={setActiveCategory}
-      />
-
-      <main className="app-main">
-        <IngredientList
-          category={activeCategory}
-          activeTimers={activeTimers}
-          onToggleTimer={handleToggleTimer}
-          onResetTimer={handleResetTimer}
-          onTimerFinish={handleTimerFinish}
-        />
-      </main>
-
-      {finishedTimers.size > 0 && (
-        <div className="finished-toast" onClick={clearFinished}>
-          <span>✅ {finishedTimers.size}个食材已完成</span>
-          <span className="toast-hint">点击关闭</span>
-        </div>
-      )}
+      <BottomNav currentPage={currentPage} onPageChange={setCurrentPage} />
 
       <footer className="app-footer">
-        <p>为每种食材选择最佳涮煮时间</p>
+        <p>Version {version}</p>
       </footer>
     </div>
   );
