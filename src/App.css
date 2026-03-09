@@ -1,0 +1,358 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.app-header {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.app-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.app-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Category Tabs */
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.category-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.category-tab.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.tab-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.tab-name {
+  font-size: 13px;
+}
+
+/* Main Content */
+.app-main {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: calc(80px + var(--safe-area-bottom));
+}
+
+/* Ingredient Grid */
+.ingredient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+/* Timer Card */
+.timer-card {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.timer-card.timer-running {
+  border-color: var(--primary-color);
+  animation: pulse-border 2s infinite;
+}
+
+.timer-card.timer-finished {
+  border-color: var(--success-color);
+  background: linear-gradient(135deg, #e8f5e9, #f5f5f5);
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 2px 12px rgba(231, 76, 60, 0.2);
+  }
+  50% {
+    box-shadow: 0 2px 20px rgba(231, 76, 60, 0.4);
+  }
+}
+
+.timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.timer-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.timer-duration {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--background-color);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.timer-display {
+  text-align: center;
+  margin: 12px 0;
+}
+
+.timer-countdown {
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--primary-color);
+}
+
+.timer-countdown.finished {
+  color: var(--success-color);
+  animation: bounce 0.5s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.timer-progress {
+  height: 4px;
+  background: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.timer-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.timer-card.timer-finished .timer-progress-bar {
+  background: var(--success-color);
+  width: 100% !important;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.timer-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timer-btn.play {
+  background: var(--primary-color);
+  color: white;
+}
+
+.timer-btn.play:active {
+  background: var(--primary-dark);
+}
+
+.timer-btn.pause {
+  background: var(--secondary-color);
+  color: white;
+}
+
+.timer-btn.pause:active {
+  background: #d68910;
+}
+
+.timer-btn.reset {
+  background: var(--background-color);
+  color: var(--text-primary);
+}
+
+.timer-btn.reset:active {
+  background: var(--border-color);
+}
+
+/* Active Timers Overview */
+.active-timers-overview {
+  background: linear-gradient(135deg, #fff5f5, #fff);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 16px;
+}
+
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.overview-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.overview-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.overview-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.overview-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.overview-item-name {
+  color: var(--text-primary);
+}
+
+.overview-item-time {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Finished Toast */
+.finished-toast {
+  position: fixed;
+  bottom: calc(80px + var(--safe-area-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--success-color);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  z-index: 100;
+  animation: slide-up 0.3s ease;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.toast-hint {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+/* Footer */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-background);
+  border-top: 1px solid var(--border-color);
+  padding: 12px 16px;
+  padding-bottom: calc(12px + var(--safe-area-bottom));
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .ingredient-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .app-header {
+    padding: 24px;
+  }
+
+  .app-title {
+    font-size: 28px;
+  }
+
+  .category-tabs {
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+
+  .category-tab {
+    flex-direction: row;
+    gap: 6px;
+  }
+}
