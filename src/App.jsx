@@ -99,6 +99,12 @@ const Timer = React.memo(function Timer({ item, isActive, timeLeft, onToggle, on
         <span className="timer-duration">{formatTime(item.time)}</span>
       </div>
 
+      {item.tip && (
+        <div className="timer-tip">
+          💡 {item.tip}
+        </div>
+      )}
+
       <div className="timer-display">
         <span className={`timer-countdown ${showFinished ? 'finished' : ''}`}>
           {showFinished ? '完成!' : formatTime(timeLeft)}
