@@ -7,6 +7,7 @@ export const ingredients = {
     items: [
       { id: 'fatty-beef', name: '肥牛卷', time: 20, minTime: 15, maxTime: 30, type: '涮', tip: '变色即可食用，久煮会柴', recommendedSauce: 'sesame-garlic', popular: true },
       { id: 'beef-slices', name: '牛肉片', time: 30, minTime: 20, maxTime: 40, type: '涮', tip: '薄片快速涮熟', recommendedSauce: 'haidilao', popular: true },
+      { id: 'beef-balls', name: '牛肉丸', time: 300, minTime: 240, maxTime: 360, type: '煮', tip: '浮起后再煮一会', recommendedSauce: 'haidilao', popular: true },
       { id: 'beef-steak', name: '火锅牛排', time: 180, minTime: 150, maxTime: 240, type: '煮', tip: '煮熟后再剪开食用', recommendedSauce: 'spicy-sichuan', popular: true },
       { id: 'lamb-slices', name: '羊肉卷', time: 20, minTime: 15, maxTime: 25, type: '涮', tip: '变色即可', recommendedSauce: 'vinegar-garlic', popular: true },
       { id: 'pork-slices', name: '猪肉片', time: 60, minTime: 50, maxTime: 80, type: '煮', tip: '需完全熟透', recommendedSauce: 'sesame-garlic', popular: false },
@@ -35,6 +36,7 @@ export const ingredients = {
     items: [
       { id: 'shrimp-paste', name: '虾滑', time: 120, minTime: 90, maxTime: 150, type: '煮', tip: '浮起即可', recommendedSauce: 'cantonese-seafood', popular: true },
       { id: 'fish-slices', name: '鱼片', time: 120, minTime: 90, maxTime: 150, type: '煮', tip: '变白即可', recommendedSauce: 'cantonese-seafood', popular: true },
+      { id: 'fish-ball', name: '耗儿鱼', time: 180, minTime: 150, maxTime: 240, type: '煮', tip: '煮熟后更入味', recommendedSauce: 'spicy-sichuan', popular: true },
       { id: 'fresh-shrimp', name: '鲜虾', time: 120, minTime: 90, maxTime: 150, type: '煮', tip: '变红即可', recommendedSauce: 'cantonese-seafood', popular: true },
       { id: 'squid', name: '鱿鱼', time: 120, minTime: 90, maxTime: 150, type: '煮', tip: '卷起即可', recommendedSauce: 'thai-style', popular: false },
       { id: 'clam', name: '花蛤', time: 180, minTime: 150, maxTime: 210, type: '煮', tip: '开口即可食用', recommendedSauce: 'cantonese-seafood', popular: false },
