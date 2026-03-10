@@ -270,6 +270,11 @@ function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, 
   return (
     <>
       <ActiveTimersOverview activeTimers={activeTimers} />
+      <FinishedTimersOverview
+        finishedTimers={finishedTimers}
+        activeTimers={activeTimers}
+        onResetAll={resetAllFinished}
+      />
 
       <CategoryTabs
         activeCategory={activeCategory}
@@ -287,12 +292,6 @@ function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, 
           onSauceClick={onSauceClick}
         />
       </main>
-
-      <FinishedTimersOverview
-        finishedTimers={finishedTimers}
-        activeTimers={activeTimers}
-        onResetAll={resetAllFinished}
-      />
     </>
   );
 }
