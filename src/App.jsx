@@ -27,6 +27,13 @@ const Timer = React.memo(function Timer({ item, isActive, timeLeft, onStart, onR
   const showFinished = timeLeft <= 0 && isFinished;
   const hasCustom = hasCustomTime(item.id);
 
+  // 获取计时器状态类名
+  const getStatusClass = () => {
+    if (showFinished) return 'timer-finished';
+    if (isActive) return 'timer-running';
+    return '';
+  };
+
   const handleEditClick = useCallback((e) => {
     e.stopPropagation();
     onEditTime(item.id, item.name, currentTime);
