@@ -1,16 +1,12 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { sauces, sauceCategories, soupBases, soupBaseCategories } from './sauces.js';
+import { storage } from './utils/storage.js';
 
 // 搜索和筛选蘸料
 export function useSauceFilter() {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sauce-favorites');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
+    return storage.getJSON('sauce-favorites', []);
   });
 
   const toggleFavorite = useCallback((id) => {
@@ -18,7 +14,7 @@ export function useSauceFilter() {
       const next = prev.includes(id)
         ? prev.filter(f => f !== id)
         : [...prev, id];
-      localStorage.setItem('sauce-favorites', JSON.stringify(next));
+      storage.setJSON('sauce-favorites', next);
       return next;
     });
   }, []);

@@ -3,46 +3,10 @@ import { ingredients, categories } from './data.js';
 import { sauces, sauceCategories } from './sauces.js';
 import SauceGuide, { SauceModal, FavoriteButton, useSauceFilter } from './SauceGuide.jsx';
 import version from './version.js';
+import { playAlarm, cleanupAudio } from './utils/audio.js';
+import { formatTime, getDefaultTime } from './utils/ingredients.js';
+import { storage } from './utils/storage.js';
 import './App.css';
-
-// 格式化时间为 MM:SS 格式
-function formatTime(seconds) {
-  const mins = Math.floor(Math.max(0, seconds) / 60);
-  const secs = Math.max(0, seconds) % 60;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
-// 播放提示音 - 使用单例模式
-let audioContext = null;
-function playAlarm() {
-  try {
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    const playTone = (freq, startTime, duration) => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.value = freq;
-      oscillator.type = 'sine';
-      gainNode.gain.setValueAtTime(0.3, startTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-
-      oscillator.start(startTime);
-      oscillator.stop(startTime + duration);
-    };
-
-    const now = audioContext.currentTime;
-    playTone(880, now, 0.5);
-    playTone(880, now + 0.6, 0.5);
-  } catch (e) {
-    console.log('Audio not supported');
-  }
-}
 
 // 震动反馈
 function vibrate(pattern = 200) {
@@ -57,10 +21,7 @@ function vibrate(pattern = 200) {
 
 // 单个计时器组件 - 使用 useMemo 优化
 const Timer = React.memo(function Timer({ item, isActive, timeLeft, onStart, onReset, onFinish, isFinished, onSauceClick }) {
-  const progress = useMemo(() => {
-    return item.time > 0 ? (timeLeft / item.time) * 100 : 0;
-  }, [item.time, timeLeft]);
-
+  const progress = item.time > 0 ? (timeLeft / item.time) * 100 : 0;
   const showFinished = timeLeft <= 0 && isFinished;
 
   useEffect(() => {
@@ -325,6 +286,18 @@ function App() {
   const [activeTimers, setActiveTimers] = useState({});
   const [finishedTimers, setFinishedTimers] = useState(new Set());
   const [selectedSauce, setSelectedSauce] = useState(null);
+  const [settings, setSettings] = useState(() => ({
+    soundEnabled: storage.getJSON('settings-sound', true),
+  }));
+
+  // 保存设置
+  const updateSetting = useCallback((key, value) => {
+    setSettings(prev => {
+      const next = { ...prev, [key]: value };
+      storage.setJSON('settings-sound', next);
+      return next;
+    });
+  }, []);
 
   // 从酱料数据中查找酱料 - 使用缓存
   const sauceCache = useMemo(() => {
@@ -390,15 +363,7 @@ function App() {
       if (currentState?.isActive) return prev;
 
       if (!currentState) {
-        let defaultTime = 60;
-        for (const cat of categories) {
-          const item = ingredients[cat].items.find(i => i.id === id);
-          if (item) {
-            defaultTime = item.time;
-            break;
-          }
-        }
-        return { ...prev, [id]: { isActive: true, timeLeft: defaultTime } };
+        return { ...prev, [id]: { isActive: true, timeLeft: getDefaultTime(id) } };
       }
       // 如果已存在但未激活（重置后），重新开始
       return {
@@ -409,17 +374,9 @@ function App() {
   }, []);
 
   const handleResetTimer = useCallback((id) => {
-    let defaultTime = 60;
-    for (const cat of categories) {
-      const item = ingredients[cat].items.find(i => i.id === id);
-      if (item) {
-        defaultTime = item.time;
-        break;
-      }
-    }
     setActiveTimers(prev => ({
       ...prev,
-      [id]: { isActive: false, timeLeft: defaultTime }
+      [id]: { isActive: false, timeLeft: getDefaultTime(id) }
     }));
     setFinishedTimers(prev => {
       const next = new Set(prev);
@@ -434,7 +391,13 @@ function App() {
       [id]: { ...prev[id], isActive: false }
     }));
     setFinishedTimers(prev => new Set(prev).add(id));
-  }, []);
+
+    // 播放提示音和震动（根据设置）
+    if (settings.soundEnabled) {
+      playAlarm();
+    }
+    vibrate([200, 100, 200, 100, 200]);
+  }, [settings.soundEnabled]);
 
   // 一键重置所有完成的计时器
   const resetAllFinished = useCallback(() => {
@@ -442,13 +405,7 @@ function App() {
     setActiveTimers(prev => {
       const updated = { ...prev };
       for (const [id, state] of Object.entries(prev)) {
-        for (const cat of categories) {
-          const item = ingredients[cat].items.find(i => i.id === id);
-          if (item) {
-            updated[id] = { isActive: false, timeLeft: item.time };
-            break;
-          }
-        }
+        updated[id] = { isActive: false, timeLeft: getDefaultTime(id) };
       }
       return updated;
     });
@@ -457,13 +414,32 @@ function App() {
   // 蘸料手册页面的收藏夹状态 - 使用统一的 useSauceFilter
   const { favorites: sauceFavorites, toggleFavorite: toggleSauceFavorite } = useSauceFilter();
 
+  // 页面卸载时清理音频
+  useEffect(() => {
+    return () => cleanupAudio();
+  }, []);
+
+  // 切换声音设置
+  const toggleSound = useCallback(() => {
+    updateSetting('soundEnabled', !settings.soundEnabled);
+  }, [settings.soundEnabled, updateSetting]);
+
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="app-title">🍲 火锅助手</h1>
-        <p className="app-subtitle">
-          {currentPage === 'timer' ? '精准掌握每种食材的最佳口感' : '调配属于你的完美蘸料'}
-        </p>
+        <div className="header-content">
+          <h1 className="app-title">🍲 火锅助手</h1>
+          <p className="app-subtitle">
+            {currentPage === 'timer' ? '精准掌握每种食材的最佳口感' : '调配属于你的完美蘸料'}
+          </p>
+        </div>
+        <button
+          className={`sound-toggle ${settings.soundEnabled ? 'on' : 'off'}`}
+          onClick={toggleSound}
+          title={settings.soundEnabled ? '点击静音' : '点击开启声音'}
+        >
+          {settings.soundEnabled ? '🔊' : '🔇'}
+        </button>
       </header>
 
       <nav className="top-nav">
