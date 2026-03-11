@@ -15,7 +15,17 @@
   --secondary-color: #8b5cf6;
   --secondary-light: #a78bfa;
 
-  /* 成功色 - 清新绿 */
+  /* 操作色 - 紫罗兰 (用于开始/播放按钮) */
+  --action-color: #8b5cf6;
+  --action-dark: #7c3aed;
+  --action-light: #a78bfa;
+
+  /* 暂停色 - 天蓝色 */
+  --pause-color: #0ea5e9;
+  --pause-dark: #0284c7;
+  --pause-light: #38bdf8;
+
+  /* 成功色 - 清新绿 (仅用于完成状态) */
   --success-color: #10b981;
   --success-light: #34d399;
 

@@ -7,11 +7,11 @@
 
 /* ============ Header 增强 ============ */
 .app-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   color: white;
   padding: 28px 16px 24px;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.3);
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
@@ -114,7 +114,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
   opacity: 0;
   transition: opacity var(--transition-base);
   z-index: 0;
@@ -136,7 +136,7 @@
 .category-tab.active {
   color: white;
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
 }
 
 .tab-icon {
@@ -203,7 +203,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  background: linear-gradient(90deg, var(--pause-color), var(--pause-light));
   opacity: 0;
   transition: opacity var(--transition-base);
 }
@@ -224,8 +224,8 @@
 }
 
 .timer-card.timer-running {
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.2);
+  border-color: var(--pause-color);
+  box-shadow: 0 4px 24px rgba(14, 165, 233, 0.2);
 }
 
 .timer-card.timer-finished {
@@ -308,10 +308,10 @@
 .sauce-recommend-btn {
   font-size: 11px;
   padding: 4px 10px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.08));
-  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(56, 189, 248, 0.08));
+  border: 1px solid rgba(14, 165, 233, 0.25);
   border-radius: var(--radius-sm);
-  color: var(--primary-color);
+  color: var(--pause-color);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-weight: 600;
@@ -319,10 +319,10 @@
 }
 
 .sauce-recommend-btn:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(96, 165, 250, 0.12));
-  border-color: var(--primary-color);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(56, 189, 248, 0.12));
+  border-color: var(--pause-color);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
 }
 
 .sauce-recommend-btn:active {
@@ -347,11 +347,11 @@
 .timer-tip {
   font-size: 12px;
   color: var(--text-secondary);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(96, 165, 250, 0.03));
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.06), rgba(56, 189, 248, 0.03));
   padding: 8px 12px;
   border-radius: var(--radius-md);
   margin-bottom: 12px;
-  border: 1px solid rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.12);
   line-height: 1.5;
   transition: all var(--transition-fast);
 }
@@ -373,9 +373,9 @@
   font-size: 36px;
   font-weight: 700;
   font-variant-numeric: tabular-nums, lining-nums;
-  color: var(--primary-color);
+  color: var(--pause-color);
   letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+  text-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
   transition: all var(--transition-fast);
 }
 
@@ -407,10 +407,10 @@
 
 .timer-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  background: linear-gradient(90deg, var(--pause-color) 0%, var(--pause-light) 100%);
   border-radius: 3px;
   transition: width var(--transition-base);
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.4);
   position: relative;
 }
 
@@ -480,29 +480,29 @@
 }
 
 .timer-btn.play {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--action-color) 0%, var(--action-dark) 100%);
   color: white;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
 }
 
 .timer-btn.play:hover {
-  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.45);
+  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.45);
   transform: translateY(-1px);
 }
 
 .timer-btn.play:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
 .timer-btn.pause {
-  background: linear-gradient(135deg, #40c057 0%, #37b24d 100%);
+  background: linear-gradient(135deg, var(--pause-color) 0%, var(--pause-dark) 100%);
   color: white;
-  box-shadow: 0 4px 16px rgba(64, 192, 87, 0.35);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.35);
 }
 
 .timer-btn.pause:hover {
-  box-shadow: 0 6px 24px rgba(64, 192, 87, 0.45);
+  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.45);
   transform: translateY(-1px);
 }
 
@@ -533,7 +533,7 @@
 
 /* ============ Active Timers Overview ============ */
 .active-timers-overview {
-  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #ecfeff 0%, #ffffff 100%);
   border-bottom: 1px solid var(--border-color);
   padding: 14px 16px;
 }
@@ -556,7 +556,7 @@
 }
 
 .reset-all-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, var(--action-color), var(--action-dark));
   color: white;
   border: none;
   padding: 8px 16px;
@@ -565,11 +565,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 3px 12px rgba(139, 92, 246, 0.3);
 }
 
 .reset-all-btn:hover {
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
   transform: translateY(-1px);
 }
 
@@ -596,7 +596,7 @@
 .overview-title {
   font-size: 15px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--pause-color);
   letter-spacing: -0.01em;
 }
 
@@ -640,9 +640,9 @@
 
 .overview-item-time {
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--pause-color);
   font-variant-numeric: tabular-nums, lining-nums;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: linear-gradient(135deg, var(--pause-color), var(--pause-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -684,7 +684,7 @@
   transform: translateX(-50%) scaleX(0);
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), transparent);
+  background: linear-gradient(180deg, rgba(14, 165, 233, 0.1), transparent);
   border-radius: var(--radius-lg);
   transition: transform var(--transition-base);
 }
@@ -710,7 +710,7 @@
 
 .nav-item.active .nav-icon {
   transform: scale(1.2);
-  filter: drop-shadow(0 3px 8px rgba(59, 130, 246, 0.4));
+  filter: drop-shadow(0 3px 8px rgba(14, 165, 233, 0.4));
 }
 
 .nav-label {
@@ -736,10 +736,10 @@
   transform: translateX(-50%) scale(0);
   width: 5px;
   height: 5px;
-  background: var(--primary-color);
+  background: var(--pause-color);
   border-radius: 50%;
   transition: transform var(--transition-base);
-  box-shadow: 0 0 8px var(--primary-color);
+  box-shadow: 0 0 8px var(--pause-color);
 }
 
 .nav-item.active::after {
@@ -873,10 +873,10 @@
 }
 
 .sauce-tag.active {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, var(--action-color), var(--action-dark));
   color: white;
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  border-color: var(--action-color);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
   transform: translateY(-1px);
 }
 
@@ -1179,7 +1179,7 @@
 .modal-done {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, var(--action-color), var(--action-dark));
   color: white;
   border: none;
   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
@@ -1191,8 +1191,8 @@
 }
 
 .modal-done:hover {
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, var(--action-dark), var(--action-color));
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
 }
 
 .modal-done:active {
