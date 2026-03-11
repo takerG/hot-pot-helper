@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, var(--background-color) 0%, #f5f3f0 100%);
+  background: linear-gradient(180deg, var(--background-color) 0%, #f1f5f9 100%);
 }
 
 /* ============ Header 增强 ============ */
@@ -11,7 +11,7 @@
   color: white;
   padding: 28px 16px 24px;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
@@ -95,7 +95,7 @@
   justify-content: center;
   gap: 6px;
   padding: 12px 16px;
-  background: linear-gradient(145deg, #faf9f8, #f1f3f4);
+  background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
   border: 1px solid transparent;
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -136,7 +136,7 @@
 .category-tab.active {
   color: white;
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.35);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
 }
 
 .tab-icon {
@@ -203,7 +203,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
   opacity: 0;
   transition: opacity var(--transition-base);
 }
@@ -225,7 +225,7 @@
 
 .timer-card.timer-running {
   border-color: var(--primary-color);
-  box-shadow: 0 4px 24px rgba(255, 107, 107, 0.2);
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.2);
 }
 
 .timer-card.timer-finished {
@@ -308,8 +308,8 @@
 .sauce-recommend-btn {
   font-size: 11px;
   padding: 4px 10px;
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.12), rgba(255, 135, 135, 0.08));
-  border: 1px solid rgba(255, 107, 107, 0.25);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.08));
+  border: 1px solid rgba(59, 130, 246, 0.25);
   border-radius: var(--radius-sm);
   color: var(--primary-color);
   cursor: pointer;
@@ -319,10 +319,10 @@
 }
 
 .sauce-recommend-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.18), rgba(255, 135, 135, 0.12));
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(96, 165, 250, 0.12));
   border-color: var(--primary-color);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .sauce-recommend-btn:active {
@@ -347,11 +347,11 @@
 .timer-tip {
   font-size: 12px;
   color: var(--text-secondary);
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.06), rgba(255, 135, 135, 0.03));
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(96, 165, 250, 0.03));
   padding: 8px 12px;
   border-radius: var(--radius-md);
   margin-bottom: 12px;
-  border: 1px solid rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.12);
   line-height: 1.5;
   transition: all var(--transition-fast);
 }
@@ -375,7 +375,7 @@
   font-variant-numeric: tabular-nums, lining-nums;
   color: var(--primary-color);
   letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+  text-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
   transition: all var(--transition-fast);
 }
 
@@ -407,10 +407,10 @@
 
 .timer-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
   border-radius: 3px;
   transition: width var(--transition-base);
-  box-shadow: 0 0 10px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
   position: relative;
 }
 
@@ -482,17 +482,17 @@
 .timer-btn.play {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
   color: white;
-  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.35);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
 }
 
 .timer-btn.play:hover {
-  box-shadow: 0 6px 24px rgba(255, 107, 107, 0.45);
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.45);
   transform: translateY(-1px);
 }
 
 .timer-btn.play:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .timer-btn.pause {
@@ -533,7 +533,7 @@
 
 /* ============ Active Timers Overview ============ */
 .active-timers-overview {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
   border-bottom: 1px solid var(--border-color);
   padding: 14px 16px;
 }
@@ -565,11 +565,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
 }
 
 .reset-all-btn:hover {
-  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
   transform: translateY(-1px);
 }
 
@@ -642,7 +642,7 @@
   font-weight: 700;
   color: var(--primary-color);
   font-variant-numeric: tabular-nums, lining-nums;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -684,7 +684,7 @@
   transform: translateX(-50%) scaleX(0);
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(255, 107, 107, 0.1), transparent);
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), transparent);
   border-radius: var(--radius-lg);
   transition: transform var(--transition-base);
 }
@@ -710,7 +710,7 @@
 
 .nav-item.active .nav-icon {
   transform: scale(1.2);
-  filter: drop-shadow(0 3px 8px rgba(255, 107, 107, 0.4));
+  filter: drop-shadow(0 3px 8px rgba(59, 130, 246, 0.4));
 }
 
 .nav-label {
@@ -799,7 +799,7 @@
 .sauce-search-input:focus {
   border-color: var(--primary-color);
   background: white;
-  box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .sauce-search-input::placeholder {
@@ -867,7 +867,7 @@
 
 .sauce-tag:hover {
   border-color: var(--primary-light);
-  background: #fff5f5;
+  background: #eff6ff;
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
@@ -876,7 +876,7 @@
   background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   border-color: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.35);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
   transform: translateY(-1px);
 }
 
@@ -1092,7 +1092,7 @@
 .modal-close:hover {
   border-color: var(--primary-color);
   color: var(--primary-color);
-  background: #fff5f5;
+  background: #eff6ff;
   transform: rotate(90deg);
 }
 
@@ -1156,7 +1156,7 @@
 .ingredient-amount {
   color: var(--primary-color);
   font-weight: 600;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1191,8 +1191,8 @@
 }
 
 .modal-done:hover {
-  background: linear-gradient(135deg, var(--primary-dark), #dd4d4d);
-  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
 }
 
 .modal-done:active {
@@ -1301,7 +1301,7 @@
 
 .pairing-sauce-tag:hover {
   border-color: var(--primary-light);
-  background: #fff5f5;
+  background: #eff6ff;
   color: var(--primary-color);
 }
 

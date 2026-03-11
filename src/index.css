@@ -5,22 +5,22 @@
 }
 
 :root {
-  /* 主色调 - 暖阳橙渐变 */
-  --primary-color: #ff6b6b;
-  --primary-dark: #ee5a5a;
-  --primary-light: #ff8787;
-  --primary-rgb: 255, 107, 107;
+  /* 主色调 - 浅蓝渐变 */
+  --primary-color: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #60a5fa;
+  --primary-rgb: 59, 130, 246;
 
-  /* 辅助色 - 蜂蜜金 */
-  --secondary-color: #f59f00;
-  --secondary-light: #ffd43b;
+  /* 辅助色 - 蓝紫 */
+  --secondary-color: #8b5cf6;
+  --secondary-light: #a78bfa;
 
   /* 成功色 - 清新绿 */
-  --success-color: #40c057;
-  --success-light: #69db7c;
+  --success-color: #10b981;
+  --success-light: #34d399;
 
-  /* 背景色 - 暖米调 */
-  --background-color: #faf9f8;
+  /* 背景色 - 冷白调 */
+  --background-color: #f8fafc;
   --card-background: #ffffff;
 
   /* 文字色 */
