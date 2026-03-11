@@ -203,7 +203,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--pause-color), var(--pause-light));
+  background: linear-gradient(90deg, var(--action-color), var(--action-light));
   opacity: 0;
   transition: opacity var(--transition-base);
 }
@@ -224,8 +224,8 @@
 }
 
 .timer-card.timer-running {
-  border-color: var(--pause-color);
-  box-shadow: 0 4px 24px rgba(47, 180, 233, 0.18);
+  border-color: var(--action-color);
+  box-shadow: 0 4px 24px rgba(151, 121, 250, 0.18);
 }
 
 .timer-card.timer-finished {
@@ -373,9 +373,9 @@
   font-size: 36px;
   font-weight: 700;
   font-variant-numeric: tabular-nums, lining-nums;
-  color: var(--pause-color);
+  color: var(--action-color);
   letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(47, 180, 233, 0.18);
+  text-shadow: 0 2px 8px rgba(151, 121, 250, 0.18);
   transition: all var(--transition-fast);
 }
 
@@ -407,10 +407,10 @@
 
 .timer-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--pause-color) 0%, var(--pause-light) 100%);
+  background: linear-gradient(90deg, var(--action-color) 0%, var(--action-light) 100%);
   border-radius: 3px;
   transition: width var(--transition-base);
-  box-shadow: 0 0 10px rgba(47, 180, 233, 0.35);
+  box-shadow: 0 0 10px rgba(151, 121, 250, 0.35);
   position: relative;
 }
 
@@ -495,19 +495,27 @@
   box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
-.timer-btn.pause {
-  background: linear-gradient(135deg, var(--pause-color) 0%, var(--pause-dark) 100%);
-  color: white;
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.35);
+/* 计时中状态 - 禁用样式 */
+.timer-btn.play:disabled {
+  opacity: 0.7;
+  cursor: default;
+  transform: none;
 }
 
-.timer-btn.pause:hover {
-  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.45);
+.timer-btn.start {
+  background: linear-gradient(135deg, var(--action-color) 0%, var(--action-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(151, 121, 250, 0.35);
+}
+
+.timer-btn.start:hover:not(:disabled) {
+  box-shadow: 0 6px 24px rgba(151, 121, 250, 0.45);
   transform: translateY(-1px);
 }
 
-.timer-btn.pause:active {
+.timer-btn.start:active {
   transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(151, 121, 250, 0.3);
 }
 
 .timer-btn.reset {
@@ -640,9 +648,9 @@
 
 .overview-item-time {
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--action-color);
   font-variant-numeric: tabular-nums, lining-nums;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  background: linear-gradient(135deg, var(--action-color), var(--action-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

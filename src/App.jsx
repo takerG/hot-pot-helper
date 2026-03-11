@@ -56,7 +56,7 @@ function vibrate(pattern = 200) {
 }
 
 // 单个计时器组件 - 使用 useMemo 优化
-const Timer = React.memo(function Timer({ item, isActive, timeLeft, onToggle, onReset, onFinish, isFinished, onSauceClick }) {
+const Timer = React.memo(function Timer({ item, isActive, timeLeft, onStart, onReset, onFinish, isFinished, onSauceClick }) {
   const progress = useMemo(() => {
     return item.time > 0 ? (timeLeft / item.time) * 100 : 0;
   }, [item.time, timeLeft]);
@@ -120,10 +120,11 @@ const Timer = React.memo(function Timer({ item, isActive, timeLeft, onToggle, on
 
       <div className="timer-controls">
         <button
-          className={`timer-btn ${isActive ? 'pause' : 'play'} ${showFinished ? 'finished' : ''}`}
-          onClick={() => onToggle(item.id)}
+          className={`timer-btn ${showFinished ? 'finished' : 'start'}`}
+          onClick={() => onStart(item.id)}
+          disabled={isActive}
         >
-          {showFinished ? '已完成' : (isActive ? '暂停' : '开始')}
+          {showFinished ? '已完成' : (isActive ? '计时中...' : '开始')}
         </button>
         <button
           className="timer-btn reset"
@@ -158,7 +159,7 @@ const CategoryTabs = React.memo(function CategoryTabs({ activeCategory, onSelect
 });
 
 // 食材列表组件
-const IngredientList = React.memo(function IngredientList({ category, activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, onSauceClick }) {
+const IngredientList = React.memo(function IngredientList({ category, activeTimers, finishedTimers, onStartTimer, onResetTimer, onTimerFinish, onSauceClick }) {
   const catData = ingredients[category];
 
   return (
@@ -174,7 +175,7 @@ const IngredientList = React.memo(function IngredientList({ category, activeTime
               isActive={timerState.isActive}
               timeLeft={timerState.timeLeft}
               isFinished={isFinished}
-              onToggle={onToggleTimer}
+              onStart={onStartTimer}
               onReset={onResetTimer}
               onFinish={onTimerFinish}
               onSauceClick={onSauceClick}
@@ -264,7 +265,7 @@ const FinishedTimersOverview = React.memo(function FinishedTimersOverview({ fini
 });
 
 // 计时器页面
-function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, onTimerFinish, onSauceClick, resetAllFinished }) {
+function TimerPage({ activeTimers, finishedTimers, onStartTimer, onResetTimer, onTimerFinish, onSauceClick, resetAllFinished }) {
   const [activeCategory, setActiveCategory] = useState('meats');
 
   return (
@@ -286,7 +287,7 @@ function TimerPage({ activeTimers, finishedTimers, onToggleTimer, onResetTimer, 
           category={activeCategory}
           activeTimers={activeTimers}
           finishedTimers={finishedTimers}
-          onToggleTimer={onToggleTimer}
+          onStartTimer={onStartTimer}
           onResetTimer={onResetTimer}
           onTimerFinish={onTimerFinish}
           onSauceClick={onSauceClick}
@@ -382,9 +383,12 @@ function App() {
     return () => clearInterval(interval);
   }, [activeTimers]);
 
-  const handleToggleTimer = useCallback((id) => {
+  const handleStartTimer = useCallback((id) => {
     setActiveTimers(prev => {
       const currentState = prev[id];
+      // 如果已经激活，忽略点击（防止重复点击）
+      if (currentState?.isActive) return prev;
+
       if (!currentState) {
         let defaultTime = 60;
         for (const cat of categories) {
@@ -396,9 +400,10 @@ function App() {
         }
         return { ...prev, [id]: { isActive: true, timeLeft: defaultTime } };
       }
+      // 如果已存在但未激活（重置后），重新开始
       return {
         ...prev,
-        [id]: { ...currentState, isActive: !currentState.isActive }
+        [id]: { ...currentState, isActive: true }
       };
     });
   }, []);
@@ -469,7 +474,7 @@ function App() {
         {currentPage === 'timer' ? (
           <TimerPage
             activeTimers={activeTimers}
-            onToggleTimer={handleToggleTimer}
+            onStartTimer={handleStartTimer}
             onResetTimer={handleResetTimer}
             onTimerFinish={handleTimerFinish}
             finishedTimers={finishedTimers}
