@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ingredients, categories } from './data.js';
-import { sauces, sauceCategories } from './sauces.js';
+import { sauces, sauceCategories, soupBases, soupBaseCategories } from './sauces.js';
 import SauceGuide, { SauceModal, FavoriteButton, useSauceFilter } from './SauceGuide.jsx';
+import EditTimeModal from './EditTimeModal.jsx';
 import version from './version.js';
 import { playAlarm, cleanupAudio } from './utils/audio.js';
-import { formatTime, getDefaultTime } from './utils/ingredients.js';
+import { formatTime, getDefaultTime, getIngredientTime, saveCustomTime, removeCustomTime, hasCustomTime } from './utils/ingredients.js';
 import { storage } from './utils/storage.js';
 import './App.css';
 
@@ -20,23 +21,16 @@ function vibrate(pattern = 200) {
 }
 
 // 单个计时器组件 - 使用 useMemo 优化
-const Timer = React.memo(function Timer({ item, isActive, timeLeft, onStart, onReset, onFinish, isFinished, onSauceClick }) {
-  const progress = item.time > 0 ? (timeLeft / item.time) * 100 : 0;
+const Timer = React.memo(function Timer({ item, isActive, timeLeft, onStart, onReset, onFinish, isFinished, onSauceClick, onEditTime }) {
+  const currentTime = getIngredientTime(item.id);
+  const progress = currentTime > 0 ? (timeLeft / currentTime) * 100 : 0;
   const showFinished = timeLeft <= 0 && isFinished;
+  const hasCustom = hasCustomTime(item.id);
 
-  useEffect(() => {
-    if (timeLeft <= 0 && isActive) {
-      playAlarm();
-      vibrate([200, 100, 200, 100, 200]);
-      onFinish(item.id);
-    }
-  }, [timeLeft, isActive, item.id, onFinish]);
-
-  const getStatusClass = useCallback(() => {
-    if (showFinished) return 'timer-finished';
-    if (isActive) return 'timer-running';
-    return '';
-  }, [showFinished, isActive]);
+  const handleEditClick = useCallback((e) => {
+    e.stopPropagation();
+    onEditTime(item.id, item.name, currentTime);
+  }, [item.id, item.name, currentTime, onEditTime]);
 
   return (
     <div className={`timer-card ${getStatusClass()}`}>
@@ -44,20 +38,34 @@ const Timer = React.memo(function Timer({ item, isActive, timeLeft, onStart, onR
         <div className="timer-name-wrapper">
           <span className="timer-name">{item.name}</span>
           {showFinished && <span className="timer-checkmark">✓</span>}
-          {item.recommendedSauce && !showFinished && (
-            <button
-              className="sauce-recommend-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSauceClick(item.recommendedSauce);
-              }}
-              title="查看推荐蘸料"
-            >
-              🥣 推荐蘸料
-            </button>
+          {!showFinished && (
+            <>
+              <button
+                className="edit-time-btn"
+                onClick={handleEditClick}
+                title={hasCustom ? '已自定义时间，点击编辑' : '点击设置时间'}
+              >
+                ⏱️
+              </button>
+              {item.recommendedSauce && (
+                <button
+                  className="sauce-recommend-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSauceClick(item.recommendedSauce);
+                  }}
+                  title="查看推荐蘸料"
+                >
+                  🥣 推荐蘸料
+                </button>
+              )}
+            </>
           )}
         </div>
-        <span className="timer-duration">{formatTime(item.time)}</span>
+        <span className={`timer-duration ${hasCustom ? 'custom' : ''}`}>
+          {formatTime(currentTime)}
+          {hasCustom && <span className="custom-indicator" title="自定义时间">●</span>}
+        </span>
       </div>
 
       {item.tip && (
@@ -98,20 +106,33 @@ const Timer = React.memo(function Timer({ item, isActive, timeLeft, onStart, onR
   );
 });
 
-// 分类标签组件
-const CategoryTabs = React.memo(function CategoryTabs({ activeCategory, onSelect }) {
+// 分类标签组件 - 带计时状态指示
+const CategoryTabs = React.memo(function CategoryTabs({ activeCategory, onSelect, activeTimers, finishedTimers }) {
   return (
     <div className="category-tabs">
       {categories.map(catId => {
         const cat = ingredients[catId];
+        const activeCount = cat.items.filter(item => activeTimers[item.id]?.isActive).length;
+        const finishedCount = cat.items.filter(item => finishedTimers.has(item.id)).length;
+        const hasActive = activeCount > 0;
+        const hasFinished = finishedCount > 0;
+
         return (
           <button
             key={catId}
             className={`category-tab ${activeCategory === catId ? 'active' : ''}`}
             onClick={() => onSelect(catId)}
           >
-            <span className="tab-icon">{cat.icon}</span>
-            <span className="tab-name">{cat.name}</span>
+            <div className="tab-content">
+              <span className="tab-icon">{cat.icon}</span>
+              <span className="tab-name">{cat.name}</span>
+            </div>
+            {(hasActive || hasFinished) && (
+              <div className="tab-indicator">
+                {hasActive && <span className="indicator-dot active" title={`${activeCount}个计时中`} />}
+                {hasFinished && <span className="indicator-dot finished" title={`${finishedCount}个已完成`} />}
+              </div>
+            )}
           </button>
         );
       })}
@@ -120,14 +141,14 @@ const CategoryTabs = React.memo(function CategoryTabs({ activeCategory, onSelect
 });
 
 // 食材列表组件
-const IngredientList = React.memo(function IngredientList({ category, activeTimers, finishedTimers, onStartTimer, onResetTimer, onTimerFinish, onSauceClick }) {
+const IngredientList = React.memo(function IngredientList({ category, activeTimers, finishedTimers, onStartTimer, onResetTimer, onTimerFinish, onSauceClick, onEditTime }) {
   const catData = ingredients[category];
 
   return (
     <div className="ingredient-list">
       <div className="ingredient-grid">
         {catData.items.map(item => {
-          const timerState = activeTimers[item.id] || { isActive: false, timeLeft: item.time };
+          const timerState = activeTimers[item.id] || { isActive: false, timeLeft: getIngredientTime(item.id) };
           const isFinished = finishedTimers.has(item.id);
           return (
             <Timer
@@ -140,6 +161,7 @@ const IngredientList = React.memo(function IngredientList({ category, activeTime
               onReset={onResetTimer}
               onFinish={onTimerFinish}
               onSauceClick={onSauceClick}
+              onEditTime={onEditTime}
             />
           );
         })}
@@ -225,12 +247,129 @@ const FinishedTimersOverview = React.memo(function FinishedTimersOverview({ fini
   );
 });
 
+// 锅底选择器组件
+const SoupBaseSelector = React.memo(function SoupBaseSelector({ selectedSoupBase, onSelect }) {
+  return (
+    <div className="soup-base-selector">
+      <div className="selector-header">
+        <span className="selector-title">🍲 选择锅底</span>
+        {selectedSoupBase && (
+          <button className="clear-soup-btn" onClick={() => onSelect(null)}>
+            取消选择
+          </button>
+        )}
+      </div>
+      <div className="soup-base-grid">
+        {soupBaseCategories.map(catId => {
+          const cat = soupBases[catId];
+          return (
+            <div key={catId} className="soup-base-category">
+              <div
+                className={`soup-base-card ${selectedSoupBase === catId ? 'selected' : ''}`}
+                onClick={() => onSelect(selectedSoupBase === catId ? null : catId)}
+              >
+                <div className="soup-base-icon">{cat.icon}</div>
+                <div className="soup-base-name">{cat.name}</div>
+                <div className="soup-base-desc">{cat.description}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
+// 推荐食材提示组件
+const RecommendedIngredients = React.memo(function RecommendedIngredients({ soupBase, onStartTimer, activeTimers }) {
+  if (!soupBase) return null;
+
+  const baseData = soupBases[soupBase];
+  const recommendedSauces = baseData.pairings?.[0]?.sauces || [];
+
+  // 收集所有推荐的食材（根据推荐蘸料反推）
+  const recommendedIngredientIds = useMemo(() => {
+    const ids = new Set();
+    for (const sauceId of recommendedSauces) {
+      // 查找使用该蘸料作为推荐的所有食材
+      for (const cat of categories) {
+        for (const item of ingredients[cat].items) {
+          if (item.recommendedSauce === sauceId) {
+            ids.add(item.id);
+          }
+        }
+      }
+    }
+    return Array.from(ids);
+  }, [recommendedSauces]);
+
+  if (recommendedIngredientIds.length === 0) return null;
+
+  return (
+    <div className="recommended-ingredients">
+      <div className="recommend-header">
+        <span className="recommend-title">
+          🥢 {baseData.pairings?.[0]?.name}推荐搭配
+        </span>
+        <span className="recommend-count">{recommendedIngredientIds.length}种食材</span>
+      </div>
+      <div className="recommend-list">
+        {recommendedIngredientIds.slice(0, 8).map(id => {
+          const item = {};
+          let found = null;
+          for (const cat of categories) {
+            found = ingredients[cat].items.find(i => i.id === id);
+            if (found) {
+              item.name = found.name;
+              item.icon = ingredients[cat].icon;
+              item.time = found.time;
+              break;
+            }
+          }
+          const isRunning = activeTimers[id]?.isActive;
+          return (
+            <button
+              key={id}
+              className={`recommend-item ${isRunning ? 'running' : ''}`}
+              onClick={() => !isRunning && onStartTimer(id)}
+              disabled={isRunning}
+            >
+              <span className="recommend-item-icon">{item.icon}</span>
+              <span className="recommend-item-name">{item.name}</span>
+              {isRunning && <span className="recommend-item-status">计时中</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
 // 计时器页面
-function TimerPage({ activeTimers, finishedTimers, onStartTimer, onResetTimer, onTimerFinish, onSauceClick, resetAllFinished }) {
+function TimerPage({ activeTimers, finishedTimers, onStartTimer, onResetTimer, onTimerFinish, onSauceClick, resetAllFinished, onEditTime }) {
   const [activeCategory, setActiveCategory] = useState('meats');
+  const [selectedSoupBase, setSelectedSoupBase] = useState(() => {
+    return storage.getJSON('selected-soup-base', null);
+  });
+
+  // 保存锅底选择
+  useEffect(() => {
+    storage.setJSON('selected-soup-base', selectedSoupBase);
+  }, [selectedSoupBase]);
 
   return (
     <>
+      <SoupBaseSelector
+        selectedSoupBase={selectedSoupBase}
+        onSelect={setSelectedSoupBase}
+      />
+
+      <RecommendedIngredients
+        soupBase={selectedSoupBase}
+        onStartTimer={onStartTimer}
+        activeTimers={activeTimers}
+      />
+
       <ActiveTimersOverview activeTimers={activeTimers} />
       <FinishedTimersOverview
         finishedTimers={finishedTimers}
@@ -241,6 +380,8 @@ function TimerPage({ activeTimers, finishedTimers, onStartTimer, onResetTimer, o
       <CategoryTabs
         activeCategory={activeCategory}
         onSelect={setActiveCategory}
+        activeTimers={activeTimers}
+        finishedTimers={finishedTimers}
       />
 
       <main className="app-main">
@@ -252,6 +393,7 @@ function TimerPage({ activeTimers, finishedTimers, onStartTimer, onResetTimer, o
           onResetTimer={onResetTimer}
           onTimerFinish={onTimerFinish}
           onSauceClick={onSauceClick}
+          onEditTime={onEditTime}
         />
       </main>
     </>
@@ -286,6 +428,7 @@ function App() {
   const [activeTimers, setActiveTimers] = useState({});
   const [finishedTimers, setFinishedTimers] = useState(new Set());
   const [selectedSauce, setSelectedSauce] = useState(null);
+  const [editingTime, setEditingTime] = useState(null); // { id, name, currentTime }
   const [settings, setSettings] = useState(() => ({
     soundEnabled: storage.getJSON('settings-sound', true),
   }));
@@ -424,6 +567,30 @@ function App() {
     updateSetting('soundEnabled', !settings.soundEnabled);
   }, [settings.soundEnabled, updateSetting]);
 
+  // 处理编辑时间
+  const handleEditTime = useCallback((id, name, currentTime) => {
+    setEditingTime({ id, name, currentTime });
+  }, []);
+
+  // 保存自定义时间
+  const handleSaveTime = useCallback((id, newTime) => {
+    saveCustomTime(id, newTime);
+    setEditingTime(null);
+    // 如果这个 timer 正在运行，更新剩余时间
+    setActiveTimers(prev => {
+      if (prev[id]?.isActive) {
+        return { ...prev, [id]: { ...prev[id], timeLeft: newTime } };
+      }
+      return prev;
+    });
+  }, []);
+
+  // 恢复默认时间
+  const handleResetTime = useCallback((id) => {
+    removeCustomTime(id);
+    setEditingTime(null);
+  }, []);
+
   return (
     <div className="app">
       <header className="app-header">
@@ -456,6 +623,7 @@ function App() {
             finishedTimers={finishedTimers}
             onSauceClick={handleSauceClick}
             resetAllFinished={resetAllFinished}
+            onEditTime={handleEditTime}
           />
         ) : (
           <SauceGuide />
@@ -469,6 +637,16 @@ function App() {
           onClose={() => setSelectedSauce(null)}
           isFavorite={sauceFavorites.includes(selectedSauce.id)}
           onToggleFavorite={() => toggleSauceFavorite(selectedSauce.id)}
+        />
+      )}
+
+      {/* 编辑时间弹窗 */}
+      {editingTime && (
+        <EditTimeModal
+          {...editingTime}
+          onSave={handleSaveTime}
+          onReset={handleResetTime}
+          onClose={() => setEditingTime(null)}
         />
       )}
 
