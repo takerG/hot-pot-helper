@@ -6,45 +6,45 @@
 
 :root {
   /* 主色调 - 浅蓝渐变 */
-  --primary-color: #3b82f6;
-  --primary-dark: #2563eb;
-  --primary-light: #60a5fa;
-  --primary-rgb: 59, 130, 246;
+  --primary-color: #60a5fa;
+  --primary-dark: #3b82f6;
+  --primary-light: #93c5fd;
+  --primary-rgb: 96, 165, 250;
 
-  /* 辅助色 - 蓝紫 */
-  --secondary-color: #8b5cf6;
-  --secondary-light: #a78bfa;
+  /* 辅助色 - 淡蓝紫 */
+  --secondary-color: #a78bfa;
+  --secondary-light: #c4b5fd;
 
-  /* 操作色 - 紫罗兰 (用于开始/播放按钮) */
-  --action-color: #8b5cf6;
-  --action-dark: #7c3aed;
-  --action-light: #a78bfa;
+  /* 操作色 - 淡紫罗兰 (用于开始/播放按钮) */
+  --action-color: #a78bfa;
+  --action-dark: #8b5cf6;
+  --action-light: #c4b5fd;
 
-  /* 暂停色 - 天蓝色 */
-  --pause-color: #0ea5e9;
-  --pause-dark: #0284c7;
-  --pause-light: #38bdf8;
+  /* 暂停色 - 浅天蓝 */
+  --pause-color: #38bdf8;
+  --pause-dark: #0ea5e9;
+  --pause-light: #7dd3fc;
 
   /* 成功色 - 清新绿 (仅用于完成状态) */
-  --success-color: #10b981;
-  --success-light: #34d399;
+  --success-color: #34d399;
+  --success-light: #6ee7b7;
 
   /* 背景色 - 冷白调 */
-  --background-color: #f8fafc;
+  --background-color: #fafdff;
   --card-background: #ffffff;
 
   /* 文字色 */
-  --text-primary: #2d2d2d;
-  --text-secondary: #868e96;
-  --text-light: #adb5bd;
+  --text-primary: #374151;
+  --text-secondary: #9ca3af;
+  --text-light: #d1d5db;
 
   /* 边框色 */
-  --border-color: #f1f3f4;
+  --border-color: #f3f4f6;
 
   /* 阴影 - 更柔和自然 */
-  --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.08);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  --shadow-hover: 0 6px 24px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
 
   /* 圆角 */
   --radius-sm: 8px;

@@ -4,7 +4,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 
 // 读取版本号
-const version = readFileSync(join(__dirname, 'version.txt'), 'utf-8').trim()
+const version = readFileSync(join(__dirname, 'VERSION'), 'utf-8').trim()
 
 export default defineConfig({
   plugins: [react()],
